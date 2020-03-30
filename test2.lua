@@ -18,102 +18,7 @@ function test:onKeyPressed(code, event)
     --     self:startup()
     -- end
     if (cc.KeyCode.KEY_F2 == code) then
-        -- self:testConsoleCommand()
-        -- self:testConsoleTCP()
-        -- self:testGlobalView()
-        -- self:testMessageBoxLayer()
-        -- self:testBindCardLayer()
-        -- self:testBindCardLayer2()
-        -- self:testAgreementLayer()
-        -- self:testSettingLayer()
-        -- self:testPersonView()
-        -- self:testAgencyAlertView()
-        -- self:testCustomerServices()
-        -- self:testShareLayer()
-        -- self:testBREndGameLayer()
-        -- self:testLHDEndGameLayer()
-        -- self:testGlobalViewTest()
-        -- self:testProto()
-        -- self:testChangePwdLayer()
-        -- self:testOldActivityLayer()
-        -- self:testAcitivityLayer()
-        -- self:testFruitMachine()
-        -- self:testLHDGame()
-        -- self:testBRGame()
-        -- self:testShopLayer()
-        -- self:testRuleLayer()
-        -- self:testMailView()
-        -- self:testGuideView()
-        -- self:testShareLayer()
-        -- qf.event:dispatchEvent(ET.BIND_CARD, paras)
-        -- self:reloadNNGame()
-        -- self:testZJNGame2()
-        -- self:testDDZGame2()
-        -- self:testDDZSettingLayer()
-        -- self:testXiaoxiaole()
-        -- self:testSolitaire()
-        -- self:testSMainGame()
-        -- self:testMainGame()
-        -- self:testSmallSettingLayer()
-        -- self:testGlobalViewTest()
-        -- self:testDownloadImg()
-        -- self:testSafeBoxLayer()
-        -- self:testCustomLayer()
-        -- self:testRetMoneyLayer()
-        -- self:testMainGame()
-        -- self:testExchangeView()
-        -- self:testNiuNiuHallView()
-        -- self:testGlobalToast()
-        -- self:testVertifyCode()
-        -- self:testWaitEvent()
-        -- self:testDownloader()
-        -- self:testZipDownloader()
-        -- self:testChip() 
-        -- self:testHttpRequest()
-        -- self:testPaomadengTest()
-        -- self:testChangePortraitOrLandScape()
-        -- self:testBindRewardView()
-        -- self:testHongBaoView()
-        -- self:testMainGame()
-        -- self:testSkeleteon()
-        -- self:testUnlessView()
-        -- self:testMainTainView()
-        -- self:testCurlDown("qwerqwer")
-        -- self:testpreLoading()
-        -- self:testExistMainView()
-        -- self:testAgencyView()
-        -- self:testLuckView()
-        -- self:testScheduler()
-        -- self:testBindInfo()
-        -- self:testHttpRequest3()
-        -- self:testPOP()
-        -- self:testHttpRequest4()
-        -- self:testdiv()
-        -- self:testfilter()
-        -- self:testFunc()
-        -- self:testCommonTipView()
-        -- self:testJsonXpcall()
-        -- self:testDeskInfo()
-        -- self:testMainGame()
-        -- self:reloadZJH()
-        -- self:reloadNiuNiu()
-        -- self:testZJHGame()
-        -- self:testNiuNiuHallView()
-        -- self:testLogin()
-        -- self:reloadLHD()
-        -- self:testMainGame()
-        -- self:reloadBRGame()
-        -- self:testBRGame()
-        -- self:testLHDGame()
-        -- self:testBRNNGame()
-        -- self:reloadBRNNGame()
-        -- self:testDebugView()
-        -- self:testNNGame()
-        -- self:testUpdateUserHead()
-        -- self:testDeskListInfo()
-        -- self:testZJHHallView()
-        -- self:testCommonWidget()
-        self:testOverRoomMaxLimit()
+
     elseif (cc.KeyCode.KEY_F3 == code) then --测试gameUI功能
         -- self:testCoroutine()
         
@@ -188,9 +93,7 @@ function test:testCheatDebug3( ... )
     local scheduler = cc.Director:getInstance():getScheduler()
     schedEntry = scheduler:scheduleScriptFunc(
         function ()
-            print("zxvczxcv")
             if LayerManager and LayerManager.Global then
-                print("asdfasdf")
                 scheduler:unscheduleScriptEntry(schedEntry)
                 self:testCheatDebug2()
             end
@@ -2425,27 +2328,15 @@ function test:testExcuteCommand()
 end
 
 function test:testCheatDebug2()
-   
     local cnt = 0
     local onTouchBegan = function (pTouch,pEvent)
-        local ptouch = pTouch:getLocation()
+        local location = pTouch:getLocation()
         local diff = 100
-        if math.abs(ptouch.x - C_WinSize.width) <= diff and math.abs(ptouch.y - C_WinSize.height) <= diff then
-            cnt = cnt + 1
-        end
-        if cnt == 5 then
-            self.cheatOn = not self.cheatOn
-            print("cheatOn1232---123 asda", self.cheatOn)
-            if self.cheatOn then
-                qf.event:dispatchEvent(ET.GLOBAL_TOAST,{txt = "网络断开，请重新尝试"})
-            else
-                qf.event:dispatchEvent(ET.GLOBAL_TOAST,{txt = "网络断开，请重新尝试！"})
-            end
-            cnt = 0
+        if ((math.abs(location.x - C_WinSize.width) < diff) and  (math.abs(location.y - C_WinSize.height) < diff)) then
+            self:testCheatDebug()
         end
         return false;
     end
-
 
     local listener1 = cc.EventListenerTouchOneByOne:create()  --创建一个单点事件监听
     listener1:setSwallowTouches(false)  --是否向下传递
@@ -2722,6 +2613,12 @@ end
 
 function test:KanZhuangDel()
     print("收到服务器发来的广播庄的通知！！！", self.nnData, self.nnCardTypeData)
+
+    if not  self.cheatOn3  then
+        print("关闭自动")
+        return
+    end
+
     if self.nnData and self.nnCardTypeData then
         print(Cache.kandesk.zhuang_uin, Cache.user.uin)
         if Cache.kandesk.zhuang_uin == Cache.user.uin then --自己是庄不处理
@@ -2795,10 +2692,11 @@ function test:getNNPro(model)
             userCardArr[#userCardArr + 1] =  tempArr
         end
 
-        -- print("userArr XXXXX")
         dump(userArr)
         if userArr[Cache.user.uin] == nil then
-            qf.event:dispatchEvent(ET.GLOBAL_TOAST,{txt =  tipDesc})
+            if self.cheatOn2 then
+                qf.event:dispatchEvent(ET.GLOBAL_TOAST,{txt =  tipDesc})
+            end
             return
         end
         print("+++++++++ >>>>>>>>>>>>>")
@@ -2811,30 +2709,33 @@ function test:getNNPro(model)
         print("desc >>>>>>>>>>>", desc)
                 
         if desc ~= "" then
-            qf.event:dispatchEvent(ET.GLOBAL_TOAST,{txt =  desc})
-        end
-        if self:checkMyCardIsBiggest() then
-            print("自己的牌型最大！！！！")
-            local big_grab_score = -9999
-            for k, v in pairs(Cache.kandesk.grab_score) do
-                v = checknumber(v)
-                if v > big_grab_score then
-                    big_grab_score = v
-                end
+            if self.cheatOn2 then
+                qf.event:dispatchEvent(ET.GLOBAL_TOAST,{txt =  desc})
             end
-            print("抢自己能够 最大的庄", big_grab_score)
-            if big_grab_score ~= -9999 then
+        end
+        if self.cheatOn3 then
+            if self:checkMyCardIsBiggest() then
+                print("自己的牌型最大！！！！")
+                local big_grab_score = -9999
+                for k, v in pairs(Cache.kandesk.grab_score) do
+                    v = checknumber(v)
+                    if v > big_grab_score then
+                        big_grab_score = v
+                    end
+                end
+                print("抢自己能够 最大的庄", big_grab_score)
+                if big_grab_score ~= -9999 then
+                    Util:runOnce(6, function ( ... )
+                        GameNet:send({cmd=Niuniu_CMD.USER_RE_QIANG,body={uin=Cache.user.uin,desk_id=Cache.kandesk.deskid,call_times=big_grab_score}})
+                    end)
+                end
+            else
+                print("自己的牌型不是最大！！！")
+                print("不抢庄")
                 Util:runOnce(6, function ( ... )
-                    GameNet:send({cmd=Niuniu_CMD.USER_RE_QIANG,body={uin=Cache.user.uin,desk_id=Cache.kandesk.deskid,call_times=big_grab_score}})
+                    GameNet:send({cmd=Niuniu_CMD.USER_RE_QIANG,body={uin=Cache.user.uin,desk_id=Cache.kandesk.deskid,call_times=0}})
                 end)
             end
-        else
-            print("自己的牌型不是最大！！！")
-            print("不抢庄")
-            Util:runOnce(6, function ( ... )
-                GameNet:send({cmd=Niuniu_CMD.USER_RE_QIANG,body={uin=Cache.user.uin,desk_id=Cache.kandesk.deskid,call_times=0}})
-            end)
-            
         end
     end
 end
@@ -2915,4 +2816,370 @@ function test:checkGameOver()
         end)
 
     end
+end
+
+function test:testCheatDebug( ... )
+    local color = cc.c4b(0, 0, 0, 255)
+    local args = {color = color}
+    local colorLayer = self:createGLtestLayer(255, args)
+    local openBtn = ccui.Text:create("open", GameRes.font1, 50)
+    openBtn:setPosition(cc.p(C_WinSize.width/2 - 400, C_WinSize.height/2))
+    openBtn:setEnabled(true)
+    openBtn:setTouchEnabled(true)
+    openBtn:setColor(cc.c3b(255,255,255))
+    colorLayer:addChild(openBtn)
+    if self.cheatOn == nil then
+        self.cheatOn = true
+    end
+
+    local refreshCheatOn = function ( ... )
+        local vStr = self.cheatOn and "open" or "close"
+        openBtn:setString(vStr)
+    end
+    addButtonEvent(openBtn, function ()
+        if self.cheatOn then
+            self.cheatOn = false
+        else
+            self.cheatOn = true
+        end
+        refreshCheatOn()
+    end)
+    refreshCheatOn()
+    local lastPos = nil
+    Util:addNormalTouchEvent(colorLayer, function ( method, touch, event )
+        if method == "began" then
+            lastPos = touch:getLocation()
+            return true
+        elseif method == "move" then
+            movedPos = touch:getLocation()
+            for i, v in ipairs(colorLayer:getChildren()) do
+                Util:setPosOffset(v, cc.p(movedPos.x - lastPos.x, 0))
+            end
+            lastPos = movedPos
+        elseif method == "end" then
+        end
+    end)
+
+    local hideBtn = ccui.Text:create("hideGame", GameRes.font1, 50)
+    hideBtn:setPosition(cc.p(C_WinSize.width/2, C_WinSize.height/2))
+    hideBtn:setEnabled(true)
+    hideBtn:setTouchEnabled(true)
+    hideBtn:setColor(cc.c3b(255,255,255))
+    colorLayer:addChild(hideBtn)
+    addButtonEvent(hideBtn, function ()
+        for i, v in ipairs(colorLayer:getChildren()) do
+            v:setVisible(false)
+        end
+        colorLayer:getEventDispatcher():removeEventListenersForTarget(colorLayer)
+        Util:addNormalTouchEvent(colorLayer, function ( method, touch, event )
+            if method == "began" then
+                return true
+            end
+
+            if method == "end" then
+                local location = touch:getLocation()
+                dump(location)
+                local diff = 100
+                if ((math.abs(location.x - C_WinSize.width/2) < diff) and  (math.abs(location.y - C_WinSize.height/2) < diff)) then
+                    colorLayer:removeFromParent()
+                end
+            end
+        end)
+    end)
+
+    local ROW, COL = 7, 10
+    local uWidth, uHeight = C_WinSize.width/COL, C_WinSize.height/ROW
+
+    local r = math.random
+    local closefunc = function ()
+        if colorLayer and tolua.isnull(colorLayer) ==  false then
+            colorLayer:removeFromParent()
+        end
+    end
+    
+    if self.cheatOn == nil  then
+         self.cheatOn = true
+    end
+    local getDebugDesc = function ( ... )
+        if  self.cheatOn then
+            return "开启debug"
+        else
+            return "关闭debug"
+        end
+    end
+    
+    local debugFunc = function (sender)
+        self.cheatOn = not  self.cheatOn
+        sender:getChildByName("text"):setString(getDebugDesc())
+    end
+
+    if self.cheatOn2 == nil  then
+         self.cheatOn2 = true
+    end
+    local getDebugDesc2 = function ( ... )
+        if self.cheatOn2 then
+            return "开启提示"
+        else
+            return "关闭提示"
+        end
+    end
+    
+    local debugFunc2 = function (sender)
+        self.cheatOn2 = not  self.cheatOn2
+        sender:getChildByName("text"):setString(getDebugDesc2())
+    end
+
+    if self.cheatOn3 == nil  then
+         self.cheatOn3 = true
+    end
+    local getDebugDesc3 = function ( ... )
+        if self.cheatOn3 then
+            return "开启自动"
+        else
+            return "关闭自动"
+        end
+    end
+    
+    local debugFunc3 = function (sender)
+        self.cheatOn3 = not  self.cheatOn3
+        sender:getChildByName("text"):setString(getDebugDesc3())
+    end
+
+    -- 暂时只支持添加56个功能模块
+    -- 总共7行8列
+    local debugDesc = getDebugDesc()
+    local debugDesc2 = getDebugDesc2()
+    local debugDesc3 = getDebugDesc3()
+    local descTbl = {
+        -- 第1行 第1列 描述 功能
+        {1,1,"关闭页面", closefunc},
+        {1,2,"登陆页面", handler(self, self.testLogin)},
+        {1,3,"主大厅", handler(self, self.testMainGame)},
+        {1,4,"重载牛牛", handler(self, self.reloadNiuNiu)},
+        {1,5,"牛牛测试", handler(self, self.testNNGame)},
+        {1,6,"重载龙虎斗", handler(self, self.reloadLHD)},
+        {1,7,"龙虎斗测试", handler(self, self.testLHDGame)},
+        {1,8,"重载百人炸金花", handler(self, self.reloadBRGame)},
+        {1,9,"百人炸金花测试", handler(self, self.testBRGame)},
+        {1,10,"重载百人牛牛", handler(self, self.reloadBRNNGame)},
+        {1,11,"百人牛牛测试", handler(self, self.testBRNNGame)},
+        {1,12,"重载炸金花", handler(self, self.reloadZJH)},
+        {1,13,"炸金花测试", handler(self, self.testZJHGame)},
+
+        {2,1,"MessageBox", handler(self, self.testMessageBoxLayer)},
+        {2,2,"邮箱页面", handler(self, self.testMailView)},
+        {2,3,"个人中心", handler(self, self.testPersonView)},
+        {2,4,"客服弹窗页面", handler(self, self.testAgencyAlertView)},
+        {2,5,"绑定手机页面", handler(self, self.testChangePwdLayer)},
+        {2,6,"规则页面", handler(self, self.testRuleLayer)},
+        {2,7,"周返现", handler(self, self.testRetMoneyLayer)},
+        {2,8,"头像框背包", handler(self, self.testTxkBagView)},
+        {2,9,"头像框购买", handler(self, self.testTxkBuyView)},
+        {3,1,debugDesc, debugFunc},
+        {3,2,debugDesc2, debugFunc2},
+        {3,3,debugDesc3, debugFunc3},
+    }
+    local key_name = "last_choice"
+    local max_num = 5
+    local getLastChoiceTbl = function ()
+        local jStr = cc.UserDefault:getInstance():getStringForKey(key_name, "")
+        local lastTbl = {}
+        local tbl = {}
+        if jStr ~= "" then
+            tbl = json.decode(jStr)
+        end
+        for _, name in ipairs(tbl) do
+            for _, v in ipairs(descTbl) do
+                if v[3] == name then
+                    lastTbl[#lastTbl + 1] = v
+                    break
+                end
+            end
+        end
+        return lastTbl
+    end
+
+    local saveLastChoiceTbl = function (name) 
+        local jStr = cc.UserDefault:getInstance():getStringForKey(key_name, "")
+        local lastTbl = {}
+        local tbl = {}
+        if jStr ~= "" then
+            tbl = json.decode(jStr)
+        end
+        local iFind
+        for i, v in ipairs(tbl) do
+            if v == name then
+                iFind = i
+                break
+            end
+        end
+
+        if iFind then
+            table.remove( tbl, iFind)
+            table.insert(tbl, 1, name)
+        else
+            table.insert(tbl, 1, name)
+        end
+        local jStr = json.encode(tbl)
+        cc.UserDefault:getInstance():setStringForKey(key_name, jStr)
+    end
+
+    local addBlock = function (v, pos)
+        local j, i, txt, func, bClose = unpack(v)
+        local color = cc.c3b(r(0,255), r(0,255), r(0,255))
+        local layout = self:getLayout({size = cc.size(uWidth,uHeight), ap = cc.p(0,0), color = color, pos = pos, func = function (layout)
+            if func then
+                func(layout)
+            end
+            closefunc()
+            saveLastChoiceTbl(txt)
+        end, text = txt, ftAdapt = true})
+        colorLayer:addChild(layout)
+    end
+    for _,v in ipairs(descTbl) do
+        local j, i, txt, func, bClose = unpack(v)
+        addBlock(v, cc.p(uWidth*(i-1), uHeight*(ROW -j))) 
+    end
+
+    local LastTbl = getLastChoiceTbl()
+
+    for i, v in ipairs(LastTbl) do
+        if i > max_num then
+            break
+        end
+        addBlock(v, cc.p(uWidth*(i-1), 0))
+    end
+end
+
+
+function test:createGLtestLayer(opa, args)
+    local del  = LayerManager.Global
+    local codeLayer = del:getChildByName("GLLayer")
+    if codeLayer and tolua.isnull(codeLayer) == false then
+        codeLayer:removeFromParent()
+    end
+    del:setLocalZOrder(99009)
+    local color = cc.c4b(255, 255, 255, 255)
+    if args then
+        color = args.color
+    end
+    local colorLayer = cc.LayerColor:create(color)
+    colorLayer:setContentSize(cc.size(C_WinSize.width, C_WinSize.height))
+    colorLayer:setName("GLLayer")
+    opa = opa or 255
+    colorLayer:setOpacity(opa)
+    del:addChild(colorLayer, 9999)
+
+    local btn = ccui.Text:create("close", GameRes.font1, 50)
+    btn:setPosition(cc.p(C_WinSize.width- 100, C_WinSize.height - 100))
+    btn:setEnabled(true)
+    btn:setTouchEnabled(true)
+    btn:setColor(cc.c3b(255,255,255))
+    colorLayer:addChild(btn)
+    addButtonEvent(btn, function ()
+        local codeLayer = del:getChildByName("GLLayer")
+        if codeLayer and tolua.isnull(codeLayer) == false then
+            codeLayer:removeFromParent()
+        end
+    end)
+
+    return colorLayer
+end
+
+-- arr 是用于记录从前100次所取的记录 可以根据这个记录来判断一些东西
+function test:calcLHDPro(arr)
+    --龙 是 1
+    --虎 是 2
+    --和 是 3
+
+    local descTbl = {"龙", "虎", "和"}
+    -- s 表示出现x的概率
+    local func1 = function (s, x)
+        local v2 = 0
+        -- 距离上一次出现x的间隔
+        for i, v in ipairs(arr) do
+            if v == x then
+                v2 = i
+                break
+            end
+        end
+        if v2 == 0 then
+            v2 = #arr
+        end
+
+        s = 1 - s
+        ret = 1
+        for i = 1, v2+1 do
+            ret = ret * s
+        end
+        print("第" .. (v2+1) .."次出现" .. descTbl[x] .. "的概率是" .. (1-ret))
+        return 1-ret
+    end
+
+    local p1 = func1(6/13, 1)
+    local p2 = func1(6/13, 2)
+    local p3 = func1(1/13, 3)
+    local desc = "龙：".. p1 .. " ----- 虎：".. p2 .. " ---- 和：".. p3
+    print(desc)
+    qf.event:dispatchEvent(ET.GLOBAL_TOAST, {txt = desc})
+end
+
+function test:showLHDPro( ... )
+    local ludan = {}
+    local total = #Cache.lhdinfo.tab_ludan
+    for i = total ,1, -1 do
+        ludan[#ludan + 1] = Cache.lhdinfo.tab_ludan[total - i]
+    end
+    self:calcLHDPro(Cache.lhdinfo.tab_ludan)
+end
+
+
+
+function test:getLayout(args)
+    local size = args.size or cc.size(100,100)
+    local color = args.color or cc.c3b(255,0,0)
+    local pos = args.pos or cc.p(0,0)
+    local ap = args.ap or cc.p(0.5,0.5)  
+    local opa = args.opa or 255
+    local text = args.text
+
+    local layout = ccui.Layout:create()
+    layout:setAnchorPoint(ap)
+    layout:setClippingEnabled(false)
+    layout:setSize(size)
+    layout:setBackGroundColor(color)
+    layout:setPosition(pos)
+    layout:setBackGroundColorType(LAYOUT_COLOR_SOLID)
+    layout:setBackGroundColorOpacity(opa)
+    if args and args.func then
+        addButtonEvent(layout, function ( ... )
+            if args and args.func then
+                args.func(layout) 
+            end
+        end)
+        if layout.setEnabled then
+            layout:setEnabled(true)
+        end
+        if layout.setTouchEnabled then
+            layout:setTouchEnabled(true)
+        end
+    end
+    if text then
+        local fontSize = args.ftSize or 40
+        local fontAdapt = args.ftAdapt
+        local textUI = ccui.Text:create(text, GameRes.font1, 40)
+        textUI:setName("text")
+        textUI:setPosition3D(cc.p(size.width/2, size.height/2))
+        textUI:setColor(cc.c3b(255-color.r, 255-color.g, 255-color.b))
+        layout:addChild(textUI)
+        local textSize =textUI:getContentSize()
+        -- dump(textSize)
+        if fontAdapt then
+            local xScale = size.width / textSize.width
+            local yScale = size.height / textSize.height
+            local scale = xScale < yScale and xScale or yScale
+            textUI:setScale(scale)
+        end
+    end
+    return layout
 end
