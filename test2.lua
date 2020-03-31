@@ -18,7 +18,7 @@ function test:onKeyPressed(code, event)
     --     self:startup()
     -- end
     if (cc.KeyCode.KEY_F2 == code) then
-
+        self:testCheatDebug()
     elseif (cc.KeyCode.KEY_F3 == code) then --测试gameUI功能
         -- self:testCoroutine()
         
@@ -2648,7 +2648,7 @@ function test:KanZhuangDel()
             end
         else
         -- 比庄大 下最小的分
-            print("应该最小的下分：", checknumber(small_call_score))
+            -- print("应该最小的下分：", checknumber(small_call_score))
             if small_call_score ~= 9999 then
                 -- body
                 Util:runOnce(3, function ( ... )
@@ -2661,7 +2661,7 @@ end
 
 -- 供给nn游戏直接调用的接口
 function test:getNNPro(model)
-    if not self.cheatOn then
+    if not self.cheatOn1 then
         return
     end
     self.nnCardTypeData = nil
@@ -2806,15 +2806,26 @@ function test:checkGameOver()
             end
             cnt = cnt + 1
         end
-        Util:runOnce(4, function ( ... )
-            if flag then
-                print("有机器人！！！ 退出牌桌")
-                qf.event:dispatchEvent(Niuniu_ET.RE_QUIT, {quitByUserFore = true})
-            else
-                print("没有机器人了， 可以继续玩")
-            end
-        end)
-
+        if self.cheatOn3 then
+            Util:runOnce(4, function ( ... )
+                if flag then
+                    print("有机器人！！！ 退出牌桌")
+                    qf.event:dispatchEvent(Niuniu_ET.RE_QUIT, {quitByUserFore = true})
+                else
+                    print("没有机器人了， 可以继续玩")
+                end
+                if self.upValue and self.upValue > 0 then
+                    if Cache.user.gold >= self.upValue then
+                        qf.event:dispatchEvent(Niuniu_ET.RE_QUIT, {quitByUserFore = true})
+                    end
+                end
+                if self.downValue and self.downValue > 0 then
+                    if Cache.user.gold <= self.downValue then
+                        qf.event:dispatchEvent(Niuniu_ET.RE_QUIT, {quitByUserFore = true})
+                    end
+                end
+            end)
+        end
     end
 end
 
@@ -2822,51 +2833,30 @@ function test:testCheatDebug( ... )
     local color = cc.c4b(0, 0, 0, 255)
     local args = {color = color}
     local colorLayer = self:createGLtestLayer(255, args)
-    local openBtn = ccui.Text:create("open", GameRes.font1, 50)
-    openBtn:setPosition(cc.p(C_WinSize.width/2 - 400, C_WinSize.height/2))
-    openBtn:setEnabled(true)
-    openBtn:setTouchEnabled(true)
-    openBtn:setColor(cc.c3b(255,255,255))
-    colorLayer:addChild(openBtn)
-    if self.cheatOn == nil then
-        self.cheatOn = true
-    end
 
-    local refreshCheatOn = function ( ... )
-        local vStr = self.cheatOn and "open" or "close"
-        openBtn:setString(vStr)
-    end
-    addButtonEvent(openBtn, function ()
-        if self.cheatOn then
-            self.cheatOn = false
-        else
-            self.cheatOn = true
-        end
-        refreshCheatOn()
-    end)
-    refreshCheatOn()
+
     local lastPos = nil
+    local diffX = 0
     Util:addNormalTouchEvent(colorLayer, function ( method, touch, event )
         if method == "began" then
             lastPos = touch:getLocation()
             return true
         elseif method == "move" then
             movedPos = touch:getLocation()
-            for i, v in ipairs(colorLayer:getChildren()) do
-                Util:setPosOffset(v, cc.p(movedPos.x - lastPos.x, 0))
+            local tempDiffX = diffX + (movedPos.x - lastPos.x)
+            if tempDiffX > 0 then
+            else
+                for i, v in ipairs(colorLayer:getChildren()) do
+                    Util:setPosOffset(v, cc.p(movedPos.x - lastPos.x, 0))
+                end
+                diffX = tempDiffX
             end
             lastPos = movedPos
         elseif method == "end" then
         end
     end)
 
-    local hideBtn = ccui.Text:create("hideGame", GameRes.font1, 50)
-    hideBtn:setPosition(cc.p(C_WinSize.width/2, C_WinSize.height/2))
-    hideBtn:setEnabled(true)
-    hideBtn:setTouchEnabled(true)
-    hideBtn:setColor(cc.c3b(255,255,255))
-    colorLayer:addChild(hideBtn)
-    addButtonEvent(hideBtn, function ()
+    local hideGameFunc = function ( ... )
         for i, v in ipairs(colorLayer:getChildren()) do
             v:setVisible(false)
         end
@@ -2885,8 +2875,7 @@ function test:testCheatDebug( ... )
                 end
             end
         end)
-    end)
-
+    end
     local ROW, COL = 7, 10
     local uWidth, uHeight = C_WinSize.width/COL, C_WinSize.height/ROW
 
@@ -2896,60 +2885,34 @@ function test:testCheatDebug( ... )
             colorLayer:removeFromParent()
         end
     end
-    
-    if self.cheatOn == nil  then
-         self.cheatOn = true
-    end
-    local getDebugDesc = function ( ... )
-        if  self.cheatOn then
-            return "开启debug"
-        else
-            return "关闭debug"
+
+    local cheatOnNumber = 3
+    for i = 1, cheatOnNumber do
+        if self["cheatOn" .. i] == nil then
+            self["cheatOn" .. i] = true
         end
     end
-    
-    local debugFunc = function (sender)
-        self.cheatOn = not  self.cheatOn
-        sender:getChildByName("text"):setString(getDebugDesc())
+    local getDebugDesc = function (cheatOnIdx)
+        local tbl = {
+            {"开启debug", "关闭debug"},
+            {"开启提示", "关闭提示"},
+            {"开启自动", "关闭自动"},
+        }
+        local ret = tbl[cheatOnIdx]
+        return self["cheatOn" .. cheatOnIdx] and ret[1] or ret[2] 
     end
 
-    if self.cheatOn2 == nil  then
-         self.cheatOn2 = true
-    end
-    local getDebugDesc2 = function ( ... )
-        if self.cheatOn2 then
-            return "开启提示"
-        else
-            return "关闭提示"
+    local debugFunc = function (cheatOnIdx)
+        return function (sender)
+            self["cheatOn" .. cheatOnIdx] = not self["cheatOn" .. cheatOnIdx]
+            sender:getChildByName("text"):setString(getDebugDesc(cheatOnIdx))
         end
     end
-    
-    local debugFunc2 = function (sender)
-        self.cheatOn2 = not  self.cheatOn2
-        sender:getChildByName("text"):setString(getDebugDesc2())
-    end
 
-    if self.cheatOn3 == nil  then
-         self.cheatOn3 = true
-    end
-    local getDebugDesc3 = function ( ... )
-        if self.cheatOn3 then
-            return "开启自动"
-        else
-            return "关闭自动"
-        end
-    end
-    
-    local debugFunc3 = function (sender)
-        self.cheatOn3 = not  self.cheatOn3
-        sender:getChildByName("text"):setString(getDebugDesc3())
-    end
-
+    -- self.cheatUpValue = 0
+    -- self.cheatUpValue = 0
     -- 暂时只支持添加56个功能模块
     -- 总共7行8列
-    local debugDesc = getDebugDesc()
-    local debugDesc2 = getDebugDesc2()
-    local debugDesc3 = getDebugDesc3()
     local descTbl = {
         -- 第1行 第1列 描述 功能
         {1,1,"关闭页面", closefunc},
@@ -2975,10 +2938,14 @@ function test:testCheatDebug( ... )
         {2,7,"周返现", handler(self, self.testRetMoneyLayer)},
         {2,8,"头像框背包", handler(self, self.testTxkBagView)},
         {2,9,"头像框购买", handler(self, self.testTxkBuyView)},
-        {3,1,debugDesc, debugFunc},
-        {3,2,debugDesc2, debugFunc2},
-        {3,3,debugDesc3, debugFunc3},
+        {3,1,getDebugDesc(1), debugFunc(1),true},
+        {3,2,getDebugDesc(2), debugFunc(2),true},
+        {3,3,getDebugDesc(3), debugFunc(3),true},
+        {3,4,"hideGame", hideGameFunc, true},
+        {3,5,"设置阈值", handler(self, self.setLimitValue), true},
+        -- {3,6,"设置玩牌时间", hideGameFunc, true},
     }
+
     local key_name = "last_choice"
     local max_num = 5
     local getLastChoiceTbl = function ()
@@ -3025,13 +2992,15 @@ function test:testCheatDebug( ... )
     end
 
     local addBlock = function (v, pos)
-        local j, i, txt, func, bClose = unpack(v)
+        local j, i, txt, func, bNotClose = unpack(v)
         local color = cc.c3b(r(0,255), r(0,255), r(0,255))
         local layout = self:getLayout({size = cc.size(uWidth,uHeight), ap = cc.p(0,0), color = color, pos = pos, func = function (layout)
             if func then
                 func(layout)
             end
-            closefunc()
+            if not bNotClose then
+                closefunc()
+            end            
             saveLastChoiceTbl(txt)
         end, text = txt, ftAdapt = true})
         colorLayer:addChild(layout)
@@ -3049,8 +3018,125 @@ function test:testCheatDebug( ... )
         end
         addBlock(v, cc.p(uWidth*(i-1), 0))
     end
+    print("gold >>>>>>>>>>>", Cache.user.gold)
+
 end
 
+function test:createEditBox(argsTbl)
+    local tag = argsTbl.tag or -987654 -----  这个虚拟editbox tag 一定要设置成这个数字 因为cocos2dx 底层 CCEditBoxImplIOS有改动  读取这个值。
+    local offset = argsTbl.offset or {x =0, y= 0}
+    local fontcolor = argsTbl.fontcolor or cc.c3b(30, 74, 130)
+    local fontname = argsTbl.fontname or GameRes.font1
+    local name = argsTbl.name or "editbox"
+    local posOffset = argsTbl.posOffset or {x =0, y= 0}
+    local fontsize = argsTbl.fontsize or 42
+    local placeFontsize = argsTbl.placefontsize or 42
+    local placeTxt = argsTbl.placeTxt or ""
+    local placeHolderColor = argsTbl.holdColor or cc.c3b(204, 204, 204)
+    local retType = argsTbl.retType or cc.KEYBOARD_RETURNTYPE_DONE
+    local handler = argsTbl.handler
+    local iMode = argsTbl.iMode
+    local csize = argsTbl.iSize
+    local iFlag = argsTbl.iFlag
+    local maxlength = argsTbl.maxLen
+    local anchorPoint = argsTbl.ap
+    local editbox
+    if csize then
+        editbox = cc.EditBox:create(csize, cc.Scale9Sprite:create())
+    end
+
+    editbox:setTag(tag)  
+    editbox:setAnchorPoint(anchorPoint)
+    editbox:setFontColor(fontcolor)
+    editbox:setFontName(fontname)
+
+    editbox:setName(name)
+    -- editbox:setCascadeOpacityEnabled(true)
+    editbox:setFontSize(fontsize)
+    
+    editbox:setPlaceholderFontSize(placeFontsize)
+    editbox:setPlaceHolder(placeTxt)
+    editbox:setPlaceholderFontColor(placeHolderColor)
+
+    -- editbox:setPosition(frame:getContentSize().width * 0.5 + posOffset.x, frame:getContentSize().height * 0.5 + posOffset.y)
+    editbox:setReturnType(retType)
+    if maxlength then
+        editbox:setMaxLength(maxlength)
+    end
+    if handler then
+        editbox:registerScriptEditBoxHandler(handler)
+    end
+
+    if iMode then
+        editbox:setInputMode(iMode)
+    end
+
+    if iFlag then
+        editbox:setInputFlag(iFlag)
+    end
+    
+    return editbox
+end
+
+function test:setLimitValue()
+    local color = cc.c4b(0, 0, 0, 180)
+    local args = {color = color}
+    local colorLayer = self:createGLtestLayer(255, args)
+    local upValueBox =  self:createEditBox({name = "upValue", iSize = cc.size(500, 100), placeTxt = "输入上限值", fontcolor = cc.c3b(255,0,0),ap= cc.p(0,0.5)})
+    colorLayer:addChild(upValueBox)
+    upValueBox:setPosition3D(cc.p(500,500))
+
+    local upText = ccui.Text:create("上限值：", GameRes.font1, 42)
+    upText:setPosition(cc.p(400,500))
+    colorLayer:addChild(upText)
+
+    local upText2 = ccui.Text:create("当前上限值：" .. Util:getFormatString(checknumber(self.upValue)), GameRes.font1, 42)
+    upText2:setPosition(cc.p(400,400))
+    colorLayer:addChild(upText2)
+    
+    local downValueBox =  self:createEditBox({name = "upValue", iSize = cc.size(500, 100), placeTxt = "输入下限值", fontcolor = cc.c3b(255,0,0),ap= cc.p(0,0.5)})
+    colorLayer:addChild(downValueBox)
+    downValueBox:setPosition3D(cc.p(500,300))
+
+    local downText = ccui.Text:create("下限值：", GameRes.font1, 42)
+    downText:setPosition(cc.p(400,300))
+    colorLayer:addChild(downText)
+
+    local downText2 = ccui.Text:create("当前下限值：" .. Util:getFormatString(checknumber(self.downValue)), GameRes.font1, 42)
+    downText2:setPosition(cc.p(400,200))
+    colorLayer:addChild(downText2)
+
+    Util:addNormalTouchEvent(colorLayer, function ( method, touch, event )
+        if method == "began" then
+            lastPos = touch:getLocation()
+            return true
+        end
+    end)
+
+    if self.upValue then
+        upValueBox:setText(self.upValue)
+    end
+    
+    if self.downValue then
+        downValueBox:setText(self.downValue)
+    end
+
+    local confirmText = ccui.Text:create("确认修改", GameRes.font1, 80)
+    confirmText:setPosition(cc.p(C_WinSize.width - 300,300))
+    confirmText:setColor(cc.c3b(255,0,0))
+    confirmText:setEnabled(true)
+    confirmText:setTouchEnabled(true)
+    addButtonEvent(confirmText, function ()
+        self.upValue = checknumber(upValueBox:getText())
+        self.downValue = checknumber(downValueBox:getText())
+        local desc =  string.format("上限值: %s, 下限值： %s", Util:getFormatString(self.upValue), Util:getFormatString(self.downValue))
+        qf.event:dispatchEvent(ET.GLOBAL_TOAST, {txt = desc})
+        if colorLayer and tolua.isnull(colorLayer) == false then
+            colorLayer:removeFromParent()
+        end
+    end)
+    colorLayer:addChild(confirmText)
+end
 
 function test:createGLtestLayer(opa, args)
     local del  = LayerManager.Global
