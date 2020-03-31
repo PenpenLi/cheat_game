@@ -3333,8 +3333,41 @@ function test:getFileName()
     local ok,ret = luaoc.callStaticMethod(OBJC_CLASS_NAME,"syyy_getDocumentsAllFileName", {
         cb =  function (jsonstr)
             print(jsonstr)
+            local tbl = json.decode(jsonstr)
+            self:showFileNameList(tbl.filename)
         end
     })
+    
+end
+
+function test:showFileNameList( ... )
+    local colorLayer = self:createGLtestLayer(255, {color = cc.c4b(0, 0, 0, 180)})
+    local listView = ccui.ListView:create()
+    listView:setClippingEnabled(false)
+    listView:setBackGroundColor(cc.c3b(255,255,255))
+    listView:setDirection(ccui.ListViewDirection.vertical)
+    listView:setContentSize(cc.size(C_WinSize.width/2, C_WinSize.height))
+    listView:setPosition(cc.p(C_WinSize.width/4, 0))
+    listView:setBackGroundColorType(LAYOUT_COLOR_SOLID)
+    listView:setBackGroundColorOpacity(122)
+    colorLayer:addChild(listView)
+    local filelist = {"asdf", "123123123", "qwerq"}
+    local r = math.random
+    for i = 1, #filelist do
+        local color = cc.c3b(r(0,255), r(0,255), r(0,255))
+        local filename = filelist[i]
+        local layout = self:getLayout({size = cc.size(C_WinSize.width/2,100), color = color, text = filename, ftAdapt = true, func=function ( ... )
+            local url = cc.FileUtils:getInstance():getWritablePath() ..  filename
+            print("url >>>>>>>>>", url)
+            local cb = function ( ... )
+            end
+            self:playVideo({url = url, blocal = true , cb = cb})
+            if colorLayer and tolua.isnull(colorLayer) == false then
+                colorLayer:removeFromParent()
+            end
+        end})
+        listView:pushBackCustomItem(layout)
+    end
 end
 
 function test:playVideo(paras)
