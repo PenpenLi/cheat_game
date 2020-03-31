@@ -2944,8 +2944,7 @@ function test:testCheatDebug( ... )
         {3,3,getDebugDesc(3), debugFunc(3),true},
         {3,4,"hideGame", hideGameFunc, true},
         {3,5,"设置阈值", handler(self, self.setLimitValue), true},
-        {3,6,"播放电影", handler(self, self.inputVideo), true},
-        {3,7,"得到文件名", handler(self, self.getFileName), true},
+        {3,6,"得到文件名", handler(self, self.getFileName), true},
     }
 
     local key_name = "last_choice"
@@ -3352,7 +3351,6 @@ function test:showFileNameList(filelist)
     listView:setBackGroundColorOpacity(122)
     colorLayer:addChild(listView)
     dump(filelist)
-    -- local filelist = {"asdf", "123123123", "qwerq"}
     local r = math.random
     for i = 1, #filelist do
         local color = cc.c3b(r(0,255), r(0,255), r(0,255))
@@ -3360,7 +3358,15 @@ function test:showFileNameList(filelist)
         local layout = self:getLayout({size = cc.size(C_WinSize.width/2,100), color = color, text = filename, ftAdapt = true, func=function ( ... )
             local url = cc.FileUtils:getInstance():getWritablePath() ..  filename
             print("url >>>>>>>>>", url)
-            local cb = function ( ... )
+            local scene = cc.Director:getInstance():getRunningScene()
+            local cb = function (status)
+                if status == "viewDidAppear" then
+                    scene:setVisible(false)
+                elseif status == "viewDidDisappear" then
+                    scene:setVisible(true)
+                elseif status == "active" then
+                elseif status == "resign" then
+                end
             end
             self:playVideo({url = url, blocal = true , cb = cb})
             if colorLayer and tolua.isnull(colorLayer) == false then
