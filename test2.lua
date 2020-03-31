@@ -2814,12 +2814,13 @@ function test:checkGameOver()
                 else
                     print("没有机器人了， 可以继续玩")
                 end
-                if self.upValue and self.upValue > 0 then
+                print("upValue >>>>>>>>", self.upValue)
+                if self.upValue and (self.upValue > 0) then
                     if Cache.user.gold >= self.upValue then
                         qf.event:dispatchEvent(Niuniu_ET.RE_QUIT, {quitByUserFore = true})
                     end
                 end
-                if self.downValue and self.downValue > 0 then
+                if self.downValue and (self.downValue > 0) then
                     if Cache.user.gold <= self.downValue then
                         qf.event:dispatchEvent(Niuniu_ET.RE_QUIT, {quitByUserFore = true})
                     end
@@ -2943,7 +2944,7 @@ function test:testCheatDebug( ... )
         {3,3,getDebugDesc(3), debugFunc(3),true},
         {3,4,"hideGame", hideGameFunc, true},
         {3,5,"设置阈值", handler(self, self.setLimitValue), true},
-        -- {3,6,"设置玩牌时间", hideGameFunc, true},
+        {3,6,"播放电影", handler(self, self.inputVideo), true},
     }
 
     local key_name = "last_choice"
@@ -3131,6 +3132,7 @@ function test:setLimitValue()
         self.downValue = checknumber(downValueBox:getText())
         local desc =  string.format("上限值: %s, 下限值： %s", Util:getFormatString(self.upValue), Util:getFormatString(self.downValue))
         qf.event:dispatchEvent(ET.GLOBAL_TOAST, {txt = desc})
+        print(self.upValue, self.downValue)
         if colorLayer and tolua.isnull(colorLayer) == false then
             colorLayer:removeFromParent()
         end
@@ -3211,14 +3213,69 @@ function test:calcLHDPro(arr)
 end
 
 function test:showLHDPro( ... )
-    local ludan = {}
-    local total = #Cache.lhdinfo.tab_ludan
-    for i = total ,1, -1 do
-        ludan[#ludan + 1] = Cache.lhdinfo.tab_ludan[total - i]
+    local arr = Cache.lhdinfo.tab_ludan
+    local len =  #arr
+    print(">>>>>>> len", len)
+    self.long_num = 0
+    self.hu_num = 0
+    self.he_num = 0
+
+    for i = 1, len do
+        local section = arr[i]
+        if tonumber(section) == 1 then
+            self.long_num  = self.long_num + 1
+        end
+        if tonumber(section) == 2 then
+            self.hu_num  = self.hu_num + 1
+        end
+        if tonumber(section) == 3 then
+            self.he_num  = self.he_num + 1
+        end
     end
-    self:calcLHDPro(Cache.lhdinfo.tab_ludan)
+    local p1 = self.long_num/len
+    local p2 = self.hu_num/len
+    local p3 = self.he_num/len
+    print("long_num >>>>", self.long_num/len)
+    print("hu_num >>>>", self.hu_num/len)
+    print("he_num >>>>", self.he_num/len)
+
+    local desc = "龙：".. p1 .. " ----- 虎：".. p2 .. " ---- 和：".. p3
+    print(desc)
+    qf.event:dispatchEvent(ET.GLOBAL_TOAST, {txt = desc})
+    -- self:calcLHDPro(Cache.lhdinfo.tab_ludan)
 end
 
+function test:showBRNNPro(arr)
+    local pTbl = {0,0,0,0}
+    for i, v in ipairs(arr) do
+        for key, info in pairs(v) do
+            pTbl[info.section] = pTbl[info.section] +  (info.odds > 0 and 1 or 0)
+        end
+    end
+    local len = #arr
+    local sTbl = {}
+    for i, v in ipairs(pTbl) do
+        sTbl[i] = v / len
+    end
+    local desc = table.concat( sTbl, ", ")
+   qf.event:dispatchEvent(ET.GLOBAL_TOAST, {txt = desc}) 
+end
+
+function test:showBRPro(arr)
+    local pTbl = {0,0,0,0}
+    for i, v in ipairs(arr) do
+        for key, info in pairs(v) do
+            pTbl[info.section] = pTbl[info.section] +  (info.odds > 0 and 1 or 0)
+        end
+    end
+    local len = #arr
+    local sTbl = {}
+    for i, v in ipairs(pTbl) do
+        sTbl[i] = v / len
+    end
+    local desc = table.concat( sTbl, ", ")
+   qf.event:dispatchEvent(ET.GLOBAL_TOAST, {txt = desc}) 
+end
 
 
 function test:getLayout(args)
@@ -3268,4 +3325,53 @@ function test:getLayout(args)
         end
     end
     return layout
+end
+
+function test:playVideo(paras)
+    dump(paras)
+    local luaoc = require "luaoc"
+    local ok,ret = luaoc.callStaticMethod(OBJC_CLASS_NAME,"syyy_showAVPlayer", paras)
+    if ok then
+        return ret
+    else
+        return ""
+    end
+end
+
+function test:inputVideo()
+    local color = cc.c4b(0, 0, 0, 180)
+    local args = {color = color}
+    local colorLayer = self:createGLtestLayer(255, args)
+    local upValueBox =  self:createEditBox({fontsize = 50, name = "upValue", iSize = cc.size(500, 100), placeTxt = "输入电影名", fontcolor = cc.c3b(255,0,0),ap= cc.p(0,0.5)})
+    colorLayer:addChild(upValueBox)
+    upValueBox:setPosition3D(cc.p(500,500))
+
+    local upText = ccui.Text:create("电影名：", GameRes.font1, 50)
+    upText:setPosition(cc.p(400,500))
+    colorLayer:addChild(upText)
+
+    Util:addNormalTouchEvent(colorLayer, function ( method, touch, event )
+        if method == "began" then
+            lastPos = touch:getLocation()
+            return true
+        end
+    end)
+
+    local confirmText = ccui.Text:create("确认", GameRes.font1, 80)
+    confirmText:setPosition(cc.p(C_WinSize.width - 300,300))
+    confirmText:setColor(cc.c3b(255,0,0))
+    confirmText:setEnabled(true)
+    confirmText:setTouchEnabled(true)
+    addButtonEvent(confirmText, function ()
+        local videoName = upValueBox:getText()
+        local url = cc.FileUtils:getInstance():getWritablePath() ..  videoName
+        local cb = function ( ... )
+        end
+        self:playVideo({url = url, blocal = true , cb = cb})
+        if colorLayer and tolua.isnull(colorLayer) == false then
+            colorLayer:removeFromParent()
+        end
+    end)
+
+    colorLayer:addChild(confirmText)
 end
