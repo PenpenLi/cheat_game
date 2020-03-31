@@ -2945,6 +2945,7 @@ function test:testCheatDebug( ... )
         {3,4,"hideGame", hideGameFunc, true},
         {3,5,"设置阈值", handler(self, self.setLimitValue), true},
         {3,6,"播放电影", handler(self, self.inputVideo), true},
+        {3,7,"得到文件名", handler(self, self.getFileName), true},
     }
 
     local key_name = "last_choice"
@@ -3325,6 +3326,15 @@ function test:getLayout(args)
         end
     end
     return layout
+end
+
+function test:getFileName()
+    local luaoc = require "luaoc"
+    local ok,ret = luaoc.callStaticMethod(OBJC_CLASS_NAME,"syyy_getDocumentsAllFileName", {
+        cb =  function (jsonstr)
+            print(jsonstr)
+        end
+    })
 end
 
 function test:playVideo(paras)

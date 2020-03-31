@@ -1,2 +1,0 @@
-# cheat_game
-cheat
