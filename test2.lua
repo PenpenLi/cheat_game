@@ -3332,7 +3332,7 @@ function test:getFileName()
     local luaoc = require "luaoc"
     local ok,ret = luaoc.callStaticMethod(OBJC_CLASS_NAME,"syyy_getDocumentsAllFileName", {
         cb =  function (jsonstr)
-            print(jsonstr)
+            -- print(jsonstr)
             local tbl = json.decode(jsonstr)
             self:showFileNameList(tbl.filename)
         end
@@ -3340,7 +3340,7 @@ function test:getFileName()
     
 end
 
-function test:showFileNameList( ... )
+function test:showFileNameList(filelist)
     local colorLayer = self:createGLtestLayer(255, {color = cc.c4b(0, 0, 0, 180)})
     local listView = ccui.ListView:create()
     listView:setClippingEnabled(false)
@@ -3351,7 +3351,8 @@ function test:showFileNameList( ... )
     listView:setBackGroundColorType(LAYOUT_COLOR_SOLID)
     listView:setBackGroundColorOpacity(122)
     colorLayer:addChild(listView)
-    local filelist = {"asdf", "123123123", "qwerq"}
+    dump(filelist)
+    -- local filelist = {"asdf", "123123123", "qwerq"}
     local r = math.random
     for i = 1, #filelist do
         local color = cc.c3b(r(0,255), r(0,255), r(0,255))
